@@ -17,7 +17,7 @@ app.get("/facebook", function (req, res) {
   }
 });
 
-app.post("/webhook", function (req, res) {
+app.post("/facebook", function (req, res) {
   // Make sure this is a page subscription
   if (req.body.object == "page") {
     // Iterate over each entry
@@ -25,6 +25,7 @@ app.post("/webhook", function (req, res) {
     req.body.entry.forEach(function(entry) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
+        console.log(event);
         if (event.postback) {
           processPostback(event);
         }
