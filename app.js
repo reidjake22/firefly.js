@@ -26,6 +26,7 @@ app.post("/facebook", function (req, res) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         if (event.postback) {
+          console.log("HELLOWORLD")
           processPostback(event);
         }
       });
