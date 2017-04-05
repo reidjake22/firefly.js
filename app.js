@@ -18,7 +18,6 @@ app.get("/facebook", function (req, res) {
 });
 
 app.post("/facebook", function (req, res) {
-  console.log(req.body);
   // Make sure this is a page subscription
   if (req.body.object == "page") {
     // Iterate over each entry
@@ -27,7 +26,7 @@ app.post("/facebook", function (req, res) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         if (event.postback) {
-          console.log(event);
+          console.log(event.postback);
           processPostback(event);
         }
       });
