@@ -7,11 +7,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
 
-app.post("/", function(req,res) {
-  res.send("WHOOOO")
-
-});
-
 app.get("/facebook", function (req, res) {
   if (req.query["hub.verify_token"] === "this_is_my_token") {
     console.info("Verified webhook");
