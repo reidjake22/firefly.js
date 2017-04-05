@@ -17,7 +17,7 @@ app.get("/facebook", function (req, res) {
   }
 });
 
-app.post("/webhook", function (req, res) {
+app.post("/facebook", function (req, res) {
   console.log(req.body);
   // Make sure this is a page subscription
   if (req.body.object == "page") {
