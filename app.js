@@ -40,7 +40,7 @@ function processPostback(event) {
   var senderId = event.sender.id;
   var payload = event.message.text;
 
-  if (payload === "hi") {
+  if (payload.toLowerCase() === "hi") {
     // Get user's first name from the User Profile API
     // and include it in the greeting
     request({
