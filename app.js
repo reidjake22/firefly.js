@@ -26,7 +26,6 @@ app.post("/facebook", function (req, res) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         if (event.postback) {
-          console.log(event.postback);
           processPostback(event);
         }
       });
@@ -36,3 +35,48 @@ app.post("/facebook", function (req, res) {
   }
 });
 
+function processPostback(event) {
+  var senderId = event.sender.id;
+  var payload = event.postback.payload;
+
+  if (payload === "Greeting") {
+    // Get user's first name from the User Profile API
+    // and include it in the greeting
+    request({
+      url: "https://graph.facebook.com/v2.6/" + senderId,
+      qs: {
+        access_token: process.env.PAGE_ACCESS_TOKEN,
+        fields: "first_name"
+      },
+      method: "GET"
+    }, function(error, response, body) {
+      var greeting = "";
+      if (error) {
+        console.log("Error getting user's name: " +  error);
+      } else {
+        var bodyObj = JSON.parse(body);
+        name = bodyObj.first_name;
+        greeting = "Hi " + name + ". ";
+      }
+      var message = greeting + "hello world";
+      sendMessage(senderId, {text: message});
+    });
+  }
+}
+
+// sends message to user
+function sendMessage(recipientId, message) {
+  request({
+    url: "https://graph.facebook.com/v2.6/me/messages",
+    qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+    method: "POST",
+    json: {
+      recipient: {id: recipientId},
+      message: message,
+    }
+  }, function(error, response, body) {
+    if (error) {
+      console.log("Error sending message: " + response.error);
+    }
+  });
+}
