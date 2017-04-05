@@ -26,7 +26,7 @@ app.post("/facebook", function (req, res) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         console.log(event);
-        if (event.postback) {
+        if (event.message) {
           processPostback(event);
         }
       });
@@ -38,7 +38,7 @@ app.post("/facebook", function (req, res) {
 
 function processPostback(event) {
   var senderId = event.sender.id;
-  var payload = event.postback.payload;
+  var payload = event.message.text;
 
   if (payload === "Greeting") {
     // Get user's first name from the User Profile API
