@@ -1,0 +1,25 @@
+{
+  "name": "firefly.js",
+  "version": "1.0.0",
+  "description": "A bot to retrieve tasks from firefly",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reidjake22/firefly.js.git"
+  },
+  "author": "Jake Reid + David™",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reidjake22/firefly.js/issues"
+  },
+  "homepage": "https://github.com/reidjake22/firefly.js#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "request": "^2.81.0"
+  }
+}
