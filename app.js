@@ -17,8 +17,23 @@ app.get("/facebook", function (req, res) {
   }
 });
 
-app.post('/facebook', function (req, res){
-    res.send('posted!');
-    // h
+app.post("/webhook", function (req, res) {
+  console.log(req.body);
+  // Make sure this is a page subscription
+  if (req.body.object == "page") {
+    // Iterate over each entry
+    // There may be multiple entries if batched
+    req.body.entry.forEach(function(entry) {
+      // Iterate over each messaging event
+      entry.messaging.forEach(function(event) {
+        if (event.postback) {
+          console.log(event);
+          processPostback(event);
+        }
+      });
+    });
+
+    res.sendStatus(200);
+  }
 });
 
