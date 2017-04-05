@@ -17,20 +17,15 @@ app.get("/facebook", function (req, res) {
   }
 });
 
-app.post("/facebook", function (req, res) {
-  console.info("post recieved from facebook")
+app.post("/webhook", function (req, res) {
   // Make sure this is a page subscription
   if (req.body.object == "page") {
-    console.info("req object is a page")
     // Iterate over each entry
     // There may be multiple entries if batched
     req.body.entry.forEach(function(entry) {
-      console.info("Looping through entries")
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
-        console.info("LOOPING THROUGH MESSAGES")
         if (event.postback) {
-          console.info("reaching POSTBACK")
           processPostback(event);
         }
       });
@@ -63,7 +58,7 @@ function processPostback(event) {
         name = bodyObj.first_name;
         greeting = "Hi " + name + ". ";
       }
-      var message = greeting + "hello world";
+      var message = greeting + "My name is SP Movie Bot. I can tell you various details regarding movies. What movie would you like to know about?";
       sendMessage(senderId, {text: message});
     });
   }
