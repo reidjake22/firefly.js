@@ -40,7 +40,7 @@ function processPostback(event) {
   var senderId = event.sender.id;
   var payload = event.message.text;
 
-  if (payload === "Greeting") {
+  if (payload === "hi") {
     // Get user's first name from the User Profile API
     // and include it in the greeting
     request({
@@ -59,7 +59,7 @@ function processPostback(event) {
         name = bodyObj.first_name;
         greeting = "Hi " + name + ". ";
       }
-      var message = greeting + "My name is SP Movie Bot. I can tell you various details regarding movies. What movie would you like to know about?";
+      var message = greeting + "You da best!";
       sendMessage(senderId, {text: message});
     });
   }
