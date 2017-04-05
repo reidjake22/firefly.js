@@ -18,15 +18,18 @@ app.get("/facebook", function (req, res) {
 });
 
 app.post("/facebook", function (req, res) {
+  console.info("post recieved from facebook")
   // Make sure this is a page subscription
   if (req.body.object == "page") {
+    console.info("req object is a page")
     // Iterate over each entry
     // There may be multiple entries if batched
     req.body.entry.forEach(function(entry) {
+      console.info("Looping through entries")
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         if (event.postback) {
-          console.log("HELLOWORLD")
+          console.info("reaching POSTBACK")
           processPostback(event);
         }
       });
