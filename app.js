@@ -28,6 +28,7 @@ app.post("/facebook", function (req, res) {
       console.info("Looping through entries")
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
+        console.info("LOOPING THROUGH MESSAGES")
         if (event.postback) {
           console.info("reaching POSTBACK")
           processPostback(event);
