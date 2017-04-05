@@ -7,11 +7,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
 
-app.get('/jake', function (req, res){
+app.get('/facebook', function (req, res){
     res.send('Deployed!');
 });
 
-app.post('/jake', function (req, res){
+app.post('/facebook', function (req, res){
     res.send('posted!');
     // h
 });
