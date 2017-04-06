@@ -1,17 +1,195 @@
 const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
-const TOKEN = 'EAAUi56w09j8BAJjZBGcX7qjVJcNeYdIEatq3BGNGKxOL5InZBr340cezl9E1j3XgflHBNZC9HEuGrpZAipmZAxyC1HTUDMxOL2kEZBUlhsAAp8Lg4RtP5hACKg1iDdOZAK7o8ttcVZCB4GCtXIeXGV12iGHMpkFbDIUHApQ9PiA84QZDZD';
+const PAGE_ACCESS_TOKEN = 'EAAUi56w09j8BAJjZBGcX7qjVJcNeYdIEatq3BGNGKxOL5InZBr340cezl9E1j3XgflHBNZC9HEuGrpZAipmZAxyC1HTUDMxOL2kEZBUlhsAAp8Lg4RtP5hACKg1iDdOZAK7o8ttcVZCB4GCtXIeXGV12iGHMpkFbDIUHApQ9PiA84QZDZD';
+const AUTH = {}; // Contains temp credentials
+const requestCookies = require('request-cookies');
 const app = express();
-app.use(bodyParser.urlencoded({extended: false}));
+const LOGIN_URL = 'https://firefly.etoncollege.org.uk/login/login.aspx?prelogin=https%3a%2f%2ffirefly.etoncollege.org.uk%2fset-tasks'
+// const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
+
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
-
-app.get('/facebook', function (req, res){
-    res.send('Deployed!');
+console.info("Server started");
+app.get("/facebook", function (req, res) {
+  if (req.query["hub.verify_token"] === "this_is_my_token") {
+    console.info("Verified webhook");
+    res.status(200).send(req.query["hub.challenge"]);
+  } else {
+    console.error("Verification failed. The tokens do not match.");
+    res.sendStatus(403);
+  }
 });
 
-app.post('/facebook', function (req, res){
-    res.send('posted!');
-    // h
+app.post('/facebook', function (req, res) {
+  var data = req.body;
+  // Make sure this is a page subscription
+  if (data.object === 'page') {
+
+    // Iterate over each entry - there may be multiple if batched
+    data.entry.forEach(function (entry) {
+      var pageID = entry.id;
+      var timeOfEvent = entry.time;      // Iterate over each messaging event
+      entry.messaging.forEach(function (event) {
+        const ed = getEventMetadata(event);
+        if (pageID != ed.senderID) {
+          if (event.message) {
+            // const reply = getMessage(event.message.text);
+            // console.log(reply);  
+            receivedMessage(event);
+          } else {
+            if (event.postback && event.postback.payload) {
+              sendTextMessage(ed.senderID, 'To receive your Firefly tasks enter your username in format username: joeblogs');
+            }
+            //console.log("Webhook received unknown event: ", event);
+          }
+        }
+      });
+
+
+
+    });
+    res.sendStatus(200);
+  }
 });
+
+function getEventMetadata(event) {
+  return {
+    senderID: event.sender.id,
+    recipientID: event.recipient.id,
+    timeOfMessage: event.timestamp,
+    message: event.message
+  }
+}
+
+function receivedMessage(event) {
+
+  var eventData = getEventMetadata(event);
+  // console.log("Received message for user %d and page %d at %d with message:", 
+  //   eventData.senderID, eventData.recipientID, eventData.timeOfMessage);
+  // console.log(JSON.stringify(eventData.message));
+  // var messageId = eventData.message.mid;
+  // var messageAttachments = eventData.message.attachments;
+  const message = getMessage(eventData.message.text, eventData.recipientID);
+  if (message === 'Logging you in...') {
+    loginFirefly(eventData);
+  } else {
+    sendTextMessage(eventData.senderID, message);
+  }
+}
+
+function getMessage(msg, recipientID) {
+  AUTH[recipientID] = {
+    Username: 'reid.j',
+    Password: 'pass.48121'
+  }
+  //check for username
+  if (msg.toLowerCase().includes('username:')) {
+    if (AUTH[recipientID] && AUTH[recipientID].Password) {
+      AUTH[recipientID].Username = msg.substr(9, msg.length).trim()
+      return 'Logging you in...';
+    } else if (AUTH[recipientID]) {
+      AUTH[recipientID].Username = msg.substr(9, msg.length).trim()
+      return 'Now input password (e.g. password: your_password)';
+    } else {
+      AUTH[recipientID] = { Username: msg.substr(9, msg.length).trim() }
+      return 'Now input password (e.g. password: your_password)';
+    }
+  }
+
+  //check for password
+  if (msg.toLowerCase().includes('password:')) {
+    if (AUTH[recipientID] && AUTH[recipientID].Username) {
+      AUTH[recipientID].Password = msg.substr(9, msg.length).trim()
+      return 'Logging you in...';
+    } else if (AUTH[recipientID]) {
+      AUTH[recipientID].Password = msg.substr(9, msg.length).trim()
+      return 'Now provide a username in the format \n username: my_username';
+    } else {
+      AUTH[recipientID] = { Password: msg.substr(9, msg.length).trim() }
+      return 'Now provide a username in the format \n username: my_username';
+    }
+  }
+
+  // other messages
+  switch (msg) {
+    case 'Jake':
+      return 'Logging you in...';
+      break;
+    default:
+      return 'Not sure what you\'re saying'
+  }
+}
+
+function loginFirefly(eventData) {
+  request({
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    uri: LOGIN_URL,
+    method: 'POST',
+    form: AUTH[eventData.recipientID]
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body);
+      sendTextMessage(eventData.senderID, 'Logged in...');
+      getTasks(eventData);
+    } else {
+      console.error("Unable to login.");
+      console.error(error, response.statusCode);
+    }
+  });
+}
+
+function getTasks(eventData) {
+  request({
+    uri: TASKS_URL,
+    method: 'GET',
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      sendTextMessage(eventData.senderID, 'Fetched Tasks...');
+      console.log(body)
+    } else {
+      console.error("Unable to fetch Tasks.");
+      console.error(error, response.statusCode);
+    }
+  });
+
+}
+
+function sendTextMessage(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText
+    }
+  };
+
+  callSendAPI(messageData);
+}
+
+function callSendAPI(messageData) {
+  console.log(messageData)
+  request({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: PAGE_ACCESS_TOKEN },
+    method: 'POST',
+    json: messageData
+
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var recipientId = body.recipient_id;
+      var messageId = body.message_id;
+
+      console.log("Successfully sent generic message with id %s to recipient %s",
+        messageId, recipientId);
+    } else {
+      console.error("Unable to send message.");
+      //console.error(response);
+      console.error(error, response.statusCode);
+    }
+  });
+}
+
+
