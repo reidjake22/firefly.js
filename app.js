@@ -110,10 +110,10 @@ function getMessage(msg, recipientID) {
   }
 
   // other messages
-  switch (msg) {
-    case 'Jake':
+  switch (msg.toLowerCase) {
+    case 'jake':
       return 'Thaaat\'s me!';
-    case:
+    case 'help':
       return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
     default:
       return 'Not sure what you\'re saying'
