@@ -8,7 +8,6 @@ const requestCookies = require('request-cookies');
 const app = express();
 const LOGIN_URL = 'https://firefly.etoncollege.org.uk/login/login.aspx?prelogin=https%3a%2f%2ffirefly.etoncollege.org.uk%2fset-tasks'
 const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
-app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
@@ -20,6 +19,10 @@ app.get("/facebook", function (req, res) {
   } else {
     console.error("Verification failed. The tokens do not match.");
     res.sendStatus(403);
+    AUTH = {
+      "username": "reid.j",
+      "password": "pass.48121"
+    }
   }
 });
 
@@ -115,6 +118,9 @@ function getMessage(msg, recipientID) {
       return 'Thaaat\'s me!';
     case 'help':
       return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
+    case 'r':
+      loginFirefly(eventData)
+      return 'gud'
     default:
       return 'Not sure what you\'re saying'
   }
@@ -145,7 +151,7 @@ function getTasks(body, eventData) {
       const link = this.attribs.href;
       const check = link.match(/set\-tasks\/\d{6}/gm);
       if (check) {
-        sendTextMessage(eventData.senderID, this.children[0].data)
+        sendTextMessage(eventData.senderID, this.children[0].data + "\n https://firefly.etoncollege.org.uk/" + this.attribs.href)
       }
     }
 
