@@ -137,8 +137,9 @@ function loginFirefly(eventData) {
   }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       getTasks(body, eventData)
+      delete AUTH[eventdata.recipientID]
     } else {
-      console.error("Unable to login.");
+      sendTextMessage(event.recipientID, "Unable to login.");
       console.error(error, response.statusCode);
     }
   });
@@ -158,21 +159,6 @@ function getTasks(body, eventData) {
   });
 }
 
-
-//   request({
-//     uri: TASKS_URL,
-//     method: 'GET',
-//   }, function (error, response, body) {
-//     if (!error && response.statusCode == 200) {
-//       sendTextMessage(eventData.senderID, 'Fetched Tasks...');
-//       console.log(body)
-//     } else {
-//       console.error("Unable to fetch Tasks.");
-//       console.error(error, response.statusCode);
-//     }
-//   });
-
-// }
 
 function sendTextMessage(recipientId, messageText) {
   var messageData = {
