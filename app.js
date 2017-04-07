@@ -113,7 +113,8 @@ function getMessage(msg, recipientID) {
   switch (msg) {
     case 'Jake':
       return 'Thaaat\'s me!';
-      break;
+    case:
+      return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
     default:
       return 'Not sure what you\'re saying'
   }
