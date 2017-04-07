@@ -8,7 +8,7 @@ const requestCookies = require('request-cookies');
 const app = express();
 const LOGIN_URL = 'https://firefly.etoncollege.org.uk/login/login.aspx?prelogin=https%3a%2f%2ffirefly.etoncollege.org.uk%2fset-tasks'
 const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
-
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
