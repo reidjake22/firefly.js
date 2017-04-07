@@ -130,7 +130,8 @@ function loginFirefly(eventData) {
       getTasks(body, eventData)
       delete AUTH[eventData.recipientID]
     } else {
-      sendTextMessage(event.recipientID, "Unable to login.");
+      sendTextMessage(eventData.recipientID, "Unable to login.");
+      delete AUTH[eventData.recipientID];
       console.error(error, response.statusCode);
     }
   });
