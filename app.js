@@ -66,7 +66,7 @@ function getEventMetadata(event) {
 function receivedMessage(event) {
   //num1
   var eventData = getEventMetadata(event);
-  const message = getMessage(eventData.message.text, eventData.recipientID);
+  const message = getMessage(eventData.message.text, eventData.senderID);
   if (message === 'Logging you in...') {
     //sendTextMessage(eventData.recipientID, "logging you in!")
     loginFirefly(eventData);
@@ -124,15 +124,15 @@ function loginFirefly(eventData) {
     jar: true,
     followAllRedirects: true,
     method: 'POST',
-    form: AUTH[eventData.recipientID]
+    form: AUTH[eventData.senderID]
   }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       getTasks(body, eventData)
-      AUTH[eventData.recipientID] = {}
+      AUTH[eventData.senderID] = {}
     } else {
       sendTextMessage(eventData.senderID, "Unable to login.");
       console.log(body)
-      AUTH[eventData.recipientID] = {}
+      AUTH[eventData.senderID] = {}
       console.error(error, response.statusCode);
     }
   });
