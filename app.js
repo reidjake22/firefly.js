@@ -1,4 +1,5 @@
 const express = require('express');
+var cheerio = require('cheerio');
 const request = require('request');
 const bodyParser = require('body-parser');
 const PAGE_ACCESS_TOKEN = 'EAAUi56w09j8BAJjZBGcX7qjVJcNeYdIEatq3BGNGKxOL5InZBr340cezl9E1j3XgflHBNZC9HEuGrpZAipmZAxyC1HTUDMxOL2kEZBUlhsAAp8Lg4RtP5hACKg1iDdOZAK7o8ttcVZCB4GCtXIeXGV12iGHMpkFbDIUHApQ9PiA84QZDZD';
@@ -6,7 +7,7 @@ const AUTH = {}; // Contains temp credentials
 const requestCookies = require('request-cookies');
 const app = express();
 const LOGIN_URL = 'https://firefly.etoncollege.org.uk/login/login.aspx?prelogin=https%3a%2f%2ffirefly.etoncollege.org.uk%2fset-tasks'
-// const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
+const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -80,10 +81,6 @@ function receivedMessage(event) {
 }
 
 function getMessage(msg, recipientID) {
-  AUTH[recipientID] = {
-    Username: 'reid.j',
-    Password: 'pass.48121'
-  }
   //check for username
   if (msg.toLowerCase().includes('username:')) {
     if (AUTH[recipientID] && AUTH[recipientID].Password) {
@@ -115,7 +112,7 @@ function getMessage(msg, recipientID) {
   // other messages
   switch (msg) {
     case 'Jake':
-      return 'Logging you in...';
+      return 'Thaaat\'s me!';
       break;
     default:
       return 'Not sure what you\'re saying'
@@ -126,13 +123,13 @@ function loginFirefly(eventData) {
   request({
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     uri: LOGIN_URL,
+    jar: true,
+    followAllRedirects: true,
     method: 'POST',
     form: AUTH[eventData.recipientID]
   }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      console.log(body);
-      sendTextMessage(eventData.senderID, 'Logged in...');
-      getTasks(eventData);
+      getTasks(body, eventData)
     } else {
       console.error("Unable to login.");
       console.error(error, response.statusCode);
@@ -140,21 +137,35 @@ function loginFirefly(eventData) {
   });
 }
 
-function getTasks(eventData) {
-  request({
-    uri: TASKS_URL,
-    method: 'GET',
-  }, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      sendTextMessage(eventData.senderID, 'Fetched Tasks...');
-      console.log(body)
-    } else {
-      console.error("Unable to fetch Tasks.");
-      console.error(error, response.statusCode);
+function getTasks(body, eventData) {
+  var $ = cheerio.load(body);
+  $('a').each(function () {
+    if (this.attribs && this.attribs.href) {
+      const link = this.attribs.href;
+      const check = link.match(/set\-tasks\/\d{6}/gm);
+      if (check) {
+        sendTextMessage(eventData.senderID, this.children[0].data)
+      }
     }
-  });
 
+  });
 }
+
+
+//   request({
+//     uri: TASKS_URL,
+//     method: 'GET',
+//   }, function (error, response, body) {
+//     if (!error && response.statusCode == 200) {
+//       sendTextMessage(eventData.senderID, 'Fetched Tasks...');
+//       console.log(body)
+//     } else {
+//       console.error("Unable to fetch Tasks.");
+//       console.error(error, response.statusCode);
+//     }
+//   });
+
+// }
 
 function sendTextMessage(recipientId, messageText) {
   var messageData = {
@@ -182,8 +193,7 @@ function callSendAPI(messageData) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
 
-      console.log("Successfully sent generic message with id %s to recipient %s",
-        messageId, recipientId);
+      console.log('Successfully sent  a message');
     } else {
       console.error("Unable to send message.");
       //console.error(response);
@@ -191,5 +201,3 @@ function callSendAPI(messageData) {
     }
   });
 }
-
-
