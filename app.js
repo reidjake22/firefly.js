@@ -128,10 +128,10 @@ function loginFirefly(eventData) {
   }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       getTasks(body, eventData)
-      AUTH[eventData.senderID] = {}
+      // AUTH[eventData.senderID] = {}
     } else {
       sendTextMessage(eventData.senderID, "Unable to login.");
-      AUTH[eventData.senderID] = {}
+      // AUTH[eventData.senderID] = {}
       console.error(error, response.statusCode);
     }
   });
