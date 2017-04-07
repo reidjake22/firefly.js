@@ -131,7 +131,6 @@ function loginFirefly(eventData) {
       AUTH[eventData.senderID] = {}
     } else {
       sendTextMessage(eventData.senderID, "Unable to login.");
-      console.log(body)
       AUTH[eventData.senderID] = {}
       console.error(error, response.statusCode);
     }
@@ -148,10 +147,14 @@ function getTasks(body, eventData) {
         sendTextMessage(eventData.senderID, this.children[0].data + "\n https://firefly.etoncollege.org.uk/" + this.attribs.href)
       }
     }
+    logOut()
 
   });
 }
 
+function logOut() {
+  request.get(https://firefly.etoncollege.org.uk/logout)
+}
 
 function sendTextMessage(recipientId, messageText) {
   var messageData = {
