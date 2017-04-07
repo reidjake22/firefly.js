@@ -153,7 +153,7 @@ function getTasks(body, eventData) {
 }
 
 function logOut() {
-  request.get(https://firefly.etoncollege.org.uk/logout)
+  request.get('https://firefly.etoncollege.org.uk/logout')
 }
 
 function sendTextMessage(recipientId, messageText) {
