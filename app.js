@@ -110,7 +110,7 @@ function getMessage(msg, recipientID) {
   }
 
   // other messages
-  switch (msg.toLowerCase) {
+  switch (msg.toLowerCase()) {
     case 'jake':
       return 'Thaaat\'s me!';
     case 'help':
