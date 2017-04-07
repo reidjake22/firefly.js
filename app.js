@@ -130,7 +130,8 @@ function loginFirefly(eventData) {
       getTasks(body, eventData)
       AUTH[eventData.recipientID] = {}
     } else {
-      sendTextMessage(eventData.recipientID, "Unable to login.");
+      sendTextMessage(eventData.senderID, "Unable to login.");
+      console.log(body)
       AUTH[eventData.recipientID] = {}
       console.error(error, response.statusCode);
     }
