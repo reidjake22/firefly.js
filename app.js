@@ -19,11 +19,7 @@ app.get("/facebook", function (req, res) {
   } else {
     console.error("Verification failed. The tokens do not match.");
     res.sendStatus(403);
-    // AUTH = {
-    //   "username": "reid.j",
-    //   "password": "pass.48121"
   }
-}
 });
 
 app.post('/facebook', function (req, res) {
