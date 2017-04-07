@@ -77,7 +77,7 @@ function receivedMessage(event) {
   // var messageAttachments = eventData.message.attachments;
   const message = getMessage(eventData.message.text, eventData.recipientID);
   if (message === 'Logging you in...') {
-    sendTextMessage(eventData.recipientID, "logging you in!")
+    //sendTextMessage(eventData.recipientID, "logging you in!")
     loginFirefly(eventData);
   } else {
     sendTextMessage(eventData.senderID, message);
