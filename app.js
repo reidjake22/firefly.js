@@ -77,6 +77,7 @@ function receivedMessage(event) {
   // var messageAttachments = eventData.message.attachments;
   const message = getMessage(eventData.message.text, eventData.recipientID);
   if (message === 'Logging you in...') {
+    sendTextMessage(eventData.recipientID, "logging you in!")
     loginFirefly(eventData);
   } else {
     sendTextMessage(eventData.senderID, message);
@@ -118,9 +119,6 @@ function getMessage(msg, recipientID) {
       return 'Thaaat\'s me!';
     case 'help':
       return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
-    case 'r':
-      loginFirefly(eventData)
-      return 'gud'
     default:
       return 'Not sure what you\'re saying'
   }
