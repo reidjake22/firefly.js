@@ -70,11 +70,6 @@ function getEventMetadata(event) {
 function receivedMessage(event) {
 
   var eventData = getEventMetadata(event);
-  // console.log("Received message for user %d and page %d at %d with message:", 
-  //   eventData.senderID, eventData.recipientID, eventData.timeOfMessage);
-  // console.log(JSON.stringify(eventData.message));
-  // var messageId = eventData.message.mid;
-  // var messageAttachments = eventData.message.attachments;
   const message = getMessage(eventData.message.text, eventData.recipientID);
   if (message === 'Logging you in...') {
     //sendTextMessage(eventData.recipientID, "logging you in!")
@@ -117,6 +112,8 @@ function getMessage(msg, recipientID) {
   switch (msg.toLowerCase()) {
     case 'jake':
       return 'Thaaat\'s me!';
+    case 'hi':
+      return 'hiya!';
     case 'help':
       return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
     default:
