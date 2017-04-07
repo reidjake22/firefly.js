@@ -19,11 +19,11 @@ app.get("/facebook", function (req, res) {
   } else {
     console.error("Verification failed. The tokens do not match.");
     res.sendStatus(403);
-    AUTH = {
-      "username": "reid.j",
-      "password": "pass.48121"
-    }
+    // AUTH = {
+    //   "username": "reid.j",
+    //   "password": "pass.48121"
   }
+}
 });
 
 app.post('/facebook', function (req, res) {
@@ -68,7 +68,7 @@ function getEventMetadata(event) {
 }
 
 function receivedMessage(event) {
-
+  //num1
   var eventData = getEventMetadata(event);
   const message = getMessage(eventData.message.text, eventData.recipientID);
   if (message === 'Logging you in...') {
@@ -108,7 +108,7 @@ function getMessage(msg, recipientID) {
     }
   }
 
-  // other messages
+  //num2
   switch (msg.toLowerCase()) {
     case 'jake':
       return 'Thaaat\'s me!';
