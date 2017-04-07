@@ -104,7 +104,7 @@ function getMessage(msg, recipientID) {
     }
   }
 
-  //num2
+  //num2sada
   switch (msg.toLowerCase()) {
     case 'jake':
       return 'Thaaat\'s me!';
