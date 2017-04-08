@@ -86,8 +86,7 @@ function getMessage(msg, recipientID) {
       return 'Now input password (e.g. password: your_password)';
     } else {
       AUTH[recipientID] = { Username: msg.substr(9, msg.length).trim() }
-      return 'Now input password (e.g. password: your_password)';
-    }
+      return a
   }
 
   //check for password
@@ -104,7 +103,7 @@ function getMessage(msg, recipientID) {
     }
   }
 
-  //num2sada
+  //num2
   switch (msg.toLowerCase()) {
     case 'jake':
       return 'Thaaat\'s me!';
