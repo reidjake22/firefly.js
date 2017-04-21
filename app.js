@@ -124,13 +124,14 @@ function loginFirefly(eventData) {
     method: 'POST',
     form: AUTH[eventData.senderID]
   }, function (error, response, body) {
+    console.log("working boss!")
     if (!error && response.statusCode == 200) {
       getTasks(body, eventData)
       // AUTH[eventData.senderID] = {}
     } else {
       sendTextMessage(eventData.senderID, "Unable to login.");
       // AUTH[eventData.senderID] = {}
-      console.error(error, response.statusCode);
+      console.error(response.statusCode);
     }
     var myjar = request.jar();
   });
