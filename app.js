@@ -190,3 +190,4 @@ function getMessage(msg, recipientID) {
       }
     });
   }
+}
