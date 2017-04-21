@@ -45,11 +45,10 @@ app.post('/facebook', function (req, res) {
             console.log("Webhook received unknown event");
           }
         }
-      }
       })
-  });
-res.sendStatus(200);
+    })
   }
+  res.sendStatus(200);
 });
 
 function getEventMetadata(event) {
