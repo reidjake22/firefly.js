@@ -1,7 +1,7 @@
 const express = require('express');
-var cheerio = require('cheerio');
 const request = require('request');
 const bodyParser = require('body-parser');
+const cheerio = require('cheerio');
 const PAGE_ACCESS_TOKEN = 'EAAUi56w09j8BAJjZBGcX7qjVJcNeYdIEatq3BGNGKxOL5InZBr340cezl9E1j3XgflHBNZC9HEuGrpZAipmZAxyC1HTUDMxOL2kEZBUlhsAAp8Lg4RtP5hACKg1iDdOZAK7o8ttcVZCB4GCtXIeXGV12iGHMpkFbDIUHApQ9PiA84QZDZD';
 const AUTH = {}; // Contains temp credentials
 const requestCookies = require('request-cookies');
@@ -19,10 +19,6 @@ app.get("/facebook", function (req, res) {
   } else {
     console.error("Verification failed. The tokens do not match.");
     res.sendStatus(403);
-    AUTH = {
-      "username": "reid.j",
-      "password": "pass.48121"
-    }
   }
 });
 
@@ -42,20 +38,17 @@ app.post('/facebook', function (req, res) {
             // const reply = getMessage(event.message.text);
             // console.log(reply);  
             receivedMessage(event);
+          }
+          else if (event.postback && event.postback.payload) {
+            sendTextMessage(ed.senderID, 'To receive your Firefly tasks enter your username in format username: joeblogs');
           } else {
-            if (event.postback && event.postback.payload) {
-              sendTextMessage(ed.senderID, 'To receive your Firefly tasks enter your username in format username: joeblogs');
-            }
-            //console.log("Webhook received unknown event: ", event);
+            console.log("Webhook received unknown event");
           }
         }
-      });
-
-
-
-    });
-    res.sendStatus(200);
+      })
+    })
   }
+  res.sendStatus(200);
 });
 
 function getEventMetadata(event) {
@@ -68,18 +61,14 @@ function getEventMetadata(event) {
 }
 
 function receivedMessage(event) {
-
+  //num1jg
   var eventData = getEventMetadata(event);
-  // console.log("Received message for user %d and page %d at %d with message:", 
-  //   eventData.senderID, eventData.recipientID, eventData.timeOfMessage);
-  // console.log(JSON.stringify(eventData.message));
-  // var messageId = eventData.message.mid;
-  // var messageAttachments = eventData.message.attachments;
-  const message = getMessage(eventData.message.text, eventData.recipientID);
+  const message = getMessage(eventData.message.text, eventData.senderID);
+  sendTextMessage(eventData.senderID, message)
   if (message === 'Logging you in...') {
+    //sendTextMessage(eventData.recipientID, "logging you in!")
     loginFirefly(eventData);
-  } else {
-    sendTextMessage(eventData.senderID, message);
+
   }
 }
 
@@ -94,7 +83,7 @@ function getMessage(msg, recipientID) {
       return 'Now input password (e.g. password: your_password)';
     } else {
       AUTH[recipientID] = { Username: msg.substr(9, msg.length).trim() }
-      return 'Now input password (e.g. password: your_password)';
+      return a
     }
   }
 
@@ -112,35 +101,39 @@ function getMessage(msg, recipientID) {
     }
   }
 
-  // other messages
+  //num2
   switch (msg.toLowerCase()) {
     case 'jake':
       return 'Thaaat\'s me!';
+    case 'hi':
+      return 'hiya!';
     case 'help':
       return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
-    case 'r':
-      loginFirefly(eventData)
-      return 'gud'
     default:
       return 'Not sure what you\'re saying'
   }
 }
 
 function loginFirefly(eventData) {
+  var myjar = request.jar();
   request({
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     uri: LOGIN_URL,
-    jar: true,
+    jar: myjar,
     followAllRedirects: true,
     method: 'POST',
-    form: AUTH[eventData.recipientID]
+    form: AUTH[eventData.senderID]
   }, function (error, response, body) {
+    console.log("working boss!")
     if (!error && response.statusCode == 200) {
       getTasks(body, eventData)
+      // AUTH[eventData.senderID] = {}
     } else {
-      console.error("Unable to login.");
-      console.error(error, response.statusCode);
+      sendTextMessage(eventData.senderID, "Unable to login.");
+      // AUTH[eventData.senderID] = {}
+      console.error(response.statusCode);
     }
+    var myjar = request.jar();
   });
 }
 
@@ -154,25 +147,9 @@ function getTasks(body, eventData) {
         sendTextMessage(eventData.senderID, this.children[0].data + "\n https://firefly.etoncollege.org.uk/" + this.attribs.href)
       }
     }
-
   });
 }
 
-
-//   request({
-//     uri: TASKS_URL,
-//     method: 'GET',
-//   }, function (error, response, body) {
-//     if (!error && response.statusCode == 200) {
-//       sendTextMessage(eventData.senderID, 'Fetched Tasks...');
-//       console.log(body)
-//     } else {
-//       console.error("Unable to fetch Tasks.");
-//       console.error(error, response.statusCode);
-//     }
-//   });
-
-// }
 
 function sendTextMessage(recipientId, messageText) {
   var messageData = {

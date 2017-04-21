@@ -21,6 +21,7 @@
     "body-parser": "^1.17.1",
     "cheerio": "^0.22.0",
     "express": "^4.15.2",
+    "plotly": "^1.0.6",
     "request": "^2.81.0",
     "request-cookies": "^1.1.0"
   }
