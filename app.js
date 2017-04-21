@@ -63,7 +63,7 @@ function getEventMetadata(event) {
 function receivedMessage(event) {
   //num1jg
   var eventData = getEventMetadata(event);
-  const message = getMessage(eventData.message.text, eventData.recipientID);
+  const message = getMessage(eventData.message.text, eventData.senderID);
   sendTextMessage(eventData.senderID, message)
   if (message === 'Logging you in...') {
     //sendTextMessage(eventData.recipientID, "logging you in!")
