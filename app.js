@@ -67,8 +67,7 @@ function receivedMessage(event) {
   if (message === 'Logging you in...') {
     //sendTextMessage(eventData.recipientID, "logging you in!")
     loginFirefly(eventData);
-  } else {
-    sendTextMessage(eventData.senderID, message);
+
   }
 }
 
@@ -85,109 +84,109 @@ function getMessage(msg, recipientID) {
       AUTH[recipientID] = { Username: msg.substr(9, msg.length).trim() }
       return a
     }
+  }
 
-    //check for password
-    if (msg.toLowerCase().includes('password:')) {
-      if (AUTH[recipientID] && AUTH[recipientID].Username) {
-        AUTH[recipientID].Password = msg.substr(9, msg.length).trim()
-        return 'Logging you in...';
-      } else if (AUTH[recipientID]) {
-        AUTH[recipientID].Password = msg.substr(9, msg.length).trim()
-        return 'Now provide a username in the format \n username: my_username';
-      } else {
-        AUTH[recipientID] = { Password: msg.substr(9, msg.length).trim() }
-        return 'Now provide a username in the format \n username: my_username';
-      }
-    }
-
-    //num2
-    switch (msg.toLowerCase()) {
-      case 'jake':
-        return 'Thaaat\'s me!';
-      case 'hi':
-        return 'hiya!';
-      case 'help':
-        return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
-      default:
-        return 'Not sure what you\'re saying'
+  //check for password
+  if (msg.toLowerCase().includes('password:')) {
+    if (AUTH[recipientID] && AUTH[recipientID].Username) {
+      AUTH[recipientID].Password = msg.substr(9, msg.length).trim()
+      return 'Logging you in...';
+    } else if (AUTH[recipientID]) {
+      AUTH[recipientID].Password = msg.substr(9, msg.length).trim()
+      return 'Now provide a username in the format \n username: my_username';
+    } else {
+      AUTH[recipientID] = { Password: msg.substr(9, msg.length).trim() }
+      return 'Now provide a username in the format \n username: my_username';
     }
   }
 
-  function loginFirefly(eventData) {
+  //num2
+  switch (msg.toLowerCase()) {
+    case 'jake':
+      return 'Thaaat\'s me!';
+    case 'hi':
+      return 'hiya!';
+    case 'help':
+      return 'Welcome to the firefly chatbot: to retrieve your firefly tasks enter username as "username:<username>" then follow your instructions'
+    default:
+      return 'Not sure what you\'re saying'
+  }
+}
+
+function loginFirefly(eventData) {
+  var myjar = request.jar();
+  request({
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    uri: LOGIN_URL,
+    jar: myjar,
+    followAllRedirects: true,
+    method: 'POST',
+    form: AUTH[eventData.recipientID]
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      getTasks(body, eventData)
+      // AUTH[eventData.senderID] = {}
+    } else {
+      sendTextMessage(eventData.senderID, "Unable to login.");
+      // AUTH[eventData.senderID] = {}
+      console.error(error, response.statusCode);
+    }
     var myjar = request.jar();
-    request({
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      uri: LOGIN_URL,
-      jar: myjar,
-      followAllRedirects: true,
-      method: 'POST',
-      form: AUTH[eventData.recipientID]
-    }, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        getTasks(body, eventData)
-        // AUTH[eventData.senderID] = {}
-      } else {
-        sendTextMessage(eventData.senderID, "Unable to login.");
-        // AUTH[eventData.senderID] = {}
-        console.error(error, response.statusCode);
+  });
+}
+
+function getTasks(body, eventData) {
+  var $ = cheerio.load(body);
+  $('a').each(function () {
+    if (this.attribs && this.attribs.href) {
+      const link = this.attribs.href;
+      const check = link.match(/set\-tasks\/\d{6}/gm);
+      if (check) {
+        sendTextMessage(eventData.senderID, this.children[0].data + "\n https://firefly.etoncollege.org.uk/" + this.attribs.href)
       }
-      var myjar = request.jar();
-    });
-  }
+    }
+    logOut()
 
-  function getTasks(body, eventData) {
-    var $ = cheerio.load(body);
-    $('a').each(function () {
-      if (this.attribs && this.attribs.href) {
-        const link = this.attribs.href;
-        const check = link.match(/set\-tasks\/\d{6}/gm);
-        if (check) {
-          sendTextMessage(eventData.senderID, this.children[0].data + "\n https://firefly.etoncollege.org.uk/" + this.attribs.href)
-        }
-      }
-      logOut()
+  });
+}
 
-    });
-  }
+function logOut() {
+  request.get('https://firefly.etoncollege.org.uk/logout', function (error, response, body) {
+    console.log(body)
+  })
+}
 
-  function logOut() {
-    request.get('https://firefly.etoncollege.org.uk/logout', function (error, response, body) {
-      console.log(body)
-    })
-  }
+function sendTextMessage(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText
+    }
+  };
 
-  function sendTextMessage(recipientId, messageText) {
-    var messageData = {
-      recipient: {
-        id: recipientId
-      },
-      message: {
-        text: messageText
-      }
-    };
+  callSendAPI(messageData);
+}
 
-    callSendAPI(messageData);
-  }
+function callSendAPI(messageData) {
+  console.log(messageData)
+  request({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: PAGE_ACCESS_TOKEN },
+    method: 'POST',
+    json: messageData
 
-  function callSendAPI(messageData) {
-    console.log(messageData)
-    request({
-      uri: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: { access_token: PAGE_ACCESS_TOKEN },
-      method: 'POST',
-      json: messageData
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var recipientId = body.recipient_id;
+      var messageId = body.message_id;
 
-    }, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        var recipientId = body.recipient_id;
-        var messageId = body.message_id;
-
-        console.log('Successfully sent  a message');
-      } else {
-        console.error("Unable to send message.");
-        //console.error(response);
-        console.error(error, response.statusCode);
-      }
-    });
-  }
+      console.log('Successfully sent  a message');
+    } else {
+      console.error("Unable to send message.");
+      //console.error(response);
+      console.error(error, response.statusCode);
+    }
+  });
 }
