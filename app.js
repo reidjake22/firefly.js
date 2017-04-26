@@ -2,7 +2,6 @@ const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
 const cheerio = require('cheerio');
-const PAGE_ACCESS_TOKEN = 'EAAUi56w09j8BAJjZBGcX7qjVJcNeYdIEatq3BGNGKxOL5InZBr340cezl9E1j3XgflHBNZC9HEuGrpZAipmZAxyC1HTUDMxOL2kEZBUlhsAAp8Lg4RtP5hACKg1iDdOZAK7o8ttcVZCB4GCtXIeXGV12iGHMpkFbDIUHApQ9PiA84QZDZD';
 const AUTH = {}; // Contains temp credentials
 const requestCookies = require('request-cookies');
 const app = express();
