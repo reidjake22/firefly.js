@@ -5,6 +5,8 @@ const cheerio = require('cheerio');
 const AUTH = {}; // Contains temp credentials
 const requestCookies = require('request-cookies');
 const app = express();
+const PAGE_ACCESS_TOKEN = '';
+const VERIFY_TOKEN = '';
 const LOGIN_URL = 'https://firefly.etoncollege.org.uk/login/login.aspx?prelogin=https%3a%2f%2ffirefly.etoncollege.org.uk%2fset-tasks'
 const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -12,7 +14,7 @@ app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
 console.info("Server started");
 app.get("/facebook", function (req, res) {
-  if (req.query["hub.verify_token"] === "this_is_my_token") {
+  if (req.query["hub.verify_token"] === VERIFY_TOKEN) {
     console.info("Verified webhook");
     res.status(200).send(req.query["hub.challenge"]);
   } else {
