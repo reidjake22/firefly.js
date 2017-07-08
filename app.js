@@ -5,8 +5,6 @@ const cheerio = require('cheerio');
 const AUTH = {}; // Contains temp credentials
 const requestCookies = require('request-cookies');
 const app = express();
-const PAGE_ACCESS_TOKEN = '';
-const VERIFY_TOKEN = '';
 const LOGIN_URL = 'https://firefly.etoncollege.org.uk/login/login.aspx?prelogin=https%3a%2f%2ffirefly.etoncollege.org.uk%2fset-tasks'
 const TASKS_URL = 'https://firefly.etoncollege.org.uk/set-tasks';
 app.use(bodyParser.urlencoded({ extended: false }));
